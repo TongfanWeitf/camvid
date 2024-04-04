@@ -43,6 +43,19 @@ def loss_fn(outputs, labels):
     return loss
     #raise NotImplementedError("Implement the loss function")
 
+def compute_iou(pred, label, num_classes):
+    iou_list = []
+    for cls in range(num_classes):
+        pred_inds = (pred == cls)
+        target_inds = (label == cls)
+        intersection = (pred_inds[target_inds]).long().sum().item()  # Cast to long to prevent overflow
+        union = pred_inds.long().sum().item() + target_inds.long().sum().item() - intersection
+        if union == 0:
+            iou_list.append(float('nan'))  # Avoid division by zero
+        else:
+            iou_list.append(float(intersection) / max(union, 1))
+    return np.array(iou_list)
+
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
