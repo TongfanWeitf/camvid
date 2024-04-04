@@ -71,7 +71,7 @@ class CamVidDataset(Dataset):
             matching = (label_array == rgb).all(axis=2)
             class_id_map[matching] = class_id
 
-        return class_id_map
+        return Image.fromarray(class_id_map, mode='L')
         #raise NotImplementedError("Implement the method")
 
 if __name__ == "__main__":

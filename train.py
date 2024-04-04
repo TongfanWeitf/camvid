@@ -34,10 +34,10 @@ images_dir_test = "test/"
 labels_dir_test = "test_labels/"
 camvid_dataset_test = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_test, labels_dir=labels_dir_test, class_dict_path=class_dict_path, resolution=resolution, crop=False)
 dataloader_test = torch.utils.data.DataLoader(camvid_dataset_test, batch_size=1, shuffle=False, num_workers=4, drop_last=False)
-
+criterion = torch.nn.CrossEntropyLoss()
 # Define the loss function and optimizer
 def loss_fn(outputs, labels):
-    criterion = torch.nn.CrossEntropyLoss()
+    
     loss = criterion(outputs, labels)
     return loss
     #raise NotImplementedError("Implement the loss function")
