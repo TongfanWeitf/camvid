@@ -49,6 +49,9 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 def eval_model(model, dataloader, device, save_pred=False):
     model.eval()
     loss_list = []
+    total_correct = 0
+    total_pixels = 0
+    iou_list = []
     if save_pred:
         pred_list = []
     with torch.no_grad():
@@ -57,13 +60,21 @@ def eval_model(model, dataloader, device, save_pred=False):
             outputs = model(images)
             loss = loss_fn(outputs, labels)
             loss_list.append(loss.item())
+
+            outputs = torch.softmax(outputs, dim=1)
             _, predicted = torch.max(outputs, 1)
             if save_pred:
                 pred_list.append(predicted.cpu().numpy())
-            raise NotImplementedError("Implement the evaluation metrics")
-        # pixel_acc = ...
-        # mean_iou = ...
-        # freq_iou = ...
+            #raise NotImplementedError("Implement the evaluation metrics")
+        
+            total_correct += (predicted == labels).sum().item()
+            total_pixels += torch.numel(labels)
+            
+            iou = compute_iou(predicted.cpu(), labels.cpu(), num_classes)
+            iou_list.append(iou)
+        pixel_acc = total_correct / total_pixels
+        mean_iou = np.nanmean(np.array(iou_list), axis=0).mean()
+        freq_iou = np.nanmean(np.nanmean(np.array(iou_list), axis=1))
         loss = sum(loss_list) / len(loss_list)
         print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
 
