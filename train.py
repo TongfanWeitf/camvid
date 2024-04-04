@@ -5,6 +5,7 @@ import os
 from tqdm import tqdm
 import numpy as np
 from PIL import Image
+import torch.nn.functional as F
 
 # Define the device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -37,8 +38,8 @@ dataloader_test = torch.utils.data.DataLoader(camvid_dataset_test, batch_size=1,
 criterion = torch.nn.CrossEntropyLoss()
 # Define the loss function and optimizer
 def loss_fn(outputs, labels):
-    
-    loss = criterion(outputs, labels)
+    outputs_resized = F.interpolate(outputs, size=(labels.size(1), labels.size(2)), mode='bilinear', align_corners=False)
+    loss = criterion(outputs_resized, labels)
     return loss
     #raise NotImplementedError("Implement the loss function")
 
