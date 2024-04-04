@@ -38,13 +38,6 @@ class FCN8s(nn.Module):
         self.score_pool4 = nn.Conv2d(512, num_classes, kernel_size=1)
         self.score_pool3 = nn.Conv2d(256, num_classes, kernel_size=1)
 
-    def crop_and_concat(self, upsampled, bypass, crop=False):
-        if crop:
-            c = (bypass.size()[2] - upsampled.size()[2]) // 2
-            bypass = F.pad(bypass, (-c, -c, -c, -c))
-        return torch.cat((upsampled, bypass), 1)
-
-
     def forward(self, x):
         pool1 = self.features_block1(x)
         pool2 = self.features_block2(pool1)
@@ -56,12 +49,14 @@ class FCN8s(nn.Module):
         upscore2 = self.upscore2(score)
 
         score_pool4 = self.score_pool4(pool4)
-        upscore2 = self.crop_and_concat(upscore2, score_pool4, crop=True)
-        upscore_pool4 = self.upscore_pool4(upscore2 + score_pool4)
+        upscore2 = F.interpolate(upscore2, size=score_pool4.size()[2:], mode='bilinear', align_corners=False)
+        combined_score = upscore2 + score_pool4
+        upscore_pool4 = self.upscore_pool4(combined_score)
 
         score_pool3 = self.score_pool3(pool3)
 
-        upscore_pool4 = self.crop_and_concat(upscore_pool4, score_pool3, crop=True)
+        upscore_pool4 = F.interpolate(upscore_pool4, size=score_pool3.size()[2:], mode='bilinear', align_corners=False)
+
         upscore_final = self.upscore_final(upscore_pool4 + score_pool3)
 
         # Return the final upsampled output
