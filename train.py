@@ -58,11 +58,12 @@ def eval_model(model, dataloader, device, save_pred=False):
         for images, labels in dataloader:
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
-            loss = loss_fn(outputs, labels)
+            outputs_resized = F.interpolate(outputs, size=labels.shape[1:], mode='bilinear', align_corners=False)
+            loss = loss_fn(outputs_resized, labels)
             loss_list.append(loss.item())
 
-            outputs = torch.softmax(outputs, dim=1)
-            _, predicted = torch.max(outputs, 1)
+            outputs = torch.softmax(outputs_resized, dim=1)
+            _, predicted = torch.max(outputs_resized, 1)
             if save_pred:
                 pred_list.append(predicted.cpu().numpy())
             #raise NotImplementedError("Implement the evaluation metrics")
