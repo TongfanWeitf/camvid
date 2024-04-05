@@ -59,12 +59,17 @@ class CamVidDataset(Dataset):
         class_dict = {}
         with open(class_dict_path, 'r') as file:
             reader = csv.reader(file)
-            next(reader)  # Skip the header if there is one
+            next(reader)  # Assuming the first row is a header
             for row in reader:
-                class_id = int(row[0])
-                rgb_values = (int(row[1]), int(row[2]), int(row[3]))
-                class_name = row[4]
-                class_dict[class_id] = (rgb_values, class_name)
+                try:
+                    class_id = int(row[0])  # Ensure this is a valid integer
+                    rgb_values = (int(row[1]), int(row[2]), int(row[3]))
+                    class_name = row[4]
+                    class_dict[class_id] = (rgb_values, class_name)
+                except ValueError:
+                    # This block will catch non-integer class_id values and continue
+                    print(f"Skipping invalid row: {row}")
+                    continue
         return class_dict
         #raise NotImplementedError("Implement the method")
 
