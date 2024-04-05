@@ -67,11 +67,15 @@ class CamVidDataset(Dataset):
         label_array = np.array(label_img)
         class_id_image = np.zeros(label_array.shape[:2], dtype=np.int32)
 
-        for rgb, (class_id, _) in self.class_dict.items():
-            matches = (label_array == rgb).all(axis=-1)
+        # Check for dictionary structure correctness
+        for rgb, class_data in self.class_dict.items():
+            if not isinstance(class_data, tuple) or len(class_data) != 2:
+                raise ValueError("Dictionary items must be tuples of the form (class_id, class_name)")
+
+            class_id, _ = class_data
+            matches = (label_array == np.array(rgb, dtype=np.uint8)).all(axis=-1)
             class_id_image[matches] = class_id
 
-        # Convert the class ID array back to a PIL Image
         return Image.fromarray(class_id_image.astype(np.uint8))
 
 if __name__ == "__main__":
