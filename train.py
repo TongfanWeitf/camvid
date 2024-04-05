@@ -90,7 +90,8 @@ def eval_model(model, dataloader, device, save_pred=False):
             iou_list.append(iou)
         pixel_acc = total_correct / total_pixels
         print(np.array(iou_list))
-        mean_iou = np.nanmean([iou for iou in iou_list if not np.isnan(iou)])
+        valid_iou_scores = [iou for iou in iou_list if not np.isnan(iou).any()]
+        mean_iou = np.nanmean(valid_iou_scores, axis=0).mean() if valid_iou_scores else 0
         freq_iou = np.nanmean(np.nanmean(np.array(iou_list), axis=1))
         loss = sum(loss_list) / len(loss_list)
         print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
