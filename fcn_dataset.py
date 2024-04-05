@@ -74,7 +74,8 @@ class CamVidDataset(Dataset):
         name_to_id = {name: idx for idx, name in enumerate(self.class_dict.keys())}
 
         for class_name, rgb_values in self.class_dict.items():
-            class_id = name_to_id[class_name]  # Get the ID for the class name
+            class_id = name_to_id[class_name]
+            print(class_id)
             matches = np.all(label_array == np.array(rgb_values, dtype=np.uint8), axis=-1)
             class_id_image[matches] = class_id
 
