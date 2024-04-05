@@ -49,7 +49,7 @@ class FCN8s(nn.Module):
         upscore2 = self.upscore2(score)
 
         score_pool4 = self.score_pool4(pool4)
-        upscore2 = cneter_crop(upscore2, score_pool4.size()[2:])
+        upscore2 = center_crop(upscore2, score_pool4.size()[2:])
         combined_score = upscore2 + score_pool4
         upscore_pool4 = self.upscore_pool4(combined_score)
 
