@@ -55,13 +55,13 @@ class FCN8s(nn.Module):
         upscore2 = self.upscore2(score)
 
         score_pool4 = self.score_pool4(pool4)
-        upscore2 = center_crop(upscore2, score_pool4.size()[2:])
+        upscore2 = self.center_crop(upscore2, score_pool4.size()[2:])
         combined_score = upscore2 + score_pool4
         upscore_pool4 = self.upscore_pool4(combined_score)
 
         score_pool3 = self.score_pool3(pool3)
 
-        upscore_pool4 = center_crop(upscore_pool4, score_pool3.size()[2:])
+        upscore_pool4 = self.center_crop(upscore_pool4, score_pool3.size()[2:])
 
         upscore_final = self.upscore_final(upscore_pool4 + score_pool3)
 
