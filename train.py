@@ -53,7 +53,7 @@ def compute_iou(pred, label, num_classes):
         union = pred_inds.sum().item() + target_inds.sum().item() - intersection
         if union == 0:
             # Skip IoU calculation if there is no union and no intersection
-            iou = float('nan') if intersection == 0 else 1.0
+            iou = float(0) 
         else:
             iou = float(intersection) / union
         iou_list.append(iou)
