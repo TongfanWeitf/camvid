@@ -45,11 +45,12 @@ def loss_fn(outputs, labels):
 
 def compute_iou(pred, label, num_classes):
     iou_list = []
+    #present_classes = torch.unique(label)
     for cls in range(num_classes):
         pred_inds = (pred == cls)
         target_inds = (label == cls)
-        intersection = (pred_inds[target_inds]).long().sum().item()  # Cast to long to prevent overflow
-        union = pred_inds.long().sum().item() + target_inds.long().sum().item() - intersection
+        intersection = (pred_inds & target_inds).sum().item()
+        union = pred_inds.sum().item() + target_inds.sum().item() - intersection
         if union == 0:
             iou_list.append(float('nan'))  # Avoid division by zero
         else:
@@ -87,7 +88,7 @@ def eval_model(model, dataloader, device, save_pred=False):
             iou = compute_iou(predicted.cpu(), labels.cpu(), num_classes)
             iou_list.append(iou)
         pixel_acc = total_correct / total_pixels
-        print(iou_list)
+        print(np.array(iou_list))
         mean_iou = np.nanmean(np.array(iou_list), axis=0).mean()
         freq_iou = np.nanmean(np.nanmean(np.array(iou_list), axis=1))
         loss = sum(loss_list) / len(loss_list)
