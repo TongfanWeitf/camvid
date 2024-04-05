@@ -87,6 +87,7 @@ def eval_model(model, dataloader, device, save_pred=False):
             iou = compute_iou(predicted.cpu(), labels.cpu(), num_classes)
             iou_list.append(iou)
         pixel_acc = total_correct / total_pixels
+        print(iou_list)
         mean_iou = np.nanmean(np.array(iou_list), axis=0).mean()
         freq_iou = np.nanmean(np.nanmean(np.array(iou_list), axis=1))
         loss = sum(loss_list) / len(loss_list)
