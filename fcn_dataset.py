@@ -69,13 +69,14 @@ class CamVidDataset(Dataset):
 
     def rgb_to_class_id(self, label_img):
         label_array = np.array(label_img)
-        class_id_image = np.zeros((label_img.height, label_img.width), dtype=np.int32)
+        class_id_images = np.array(self.images)
         # Create a mapping of class names to IDs
         name_to_id = {name: idx for idx, name in enumerate(self.class_dict.keys())}
 
         for class_name, rgb_values in self.class_dict.items():
             class_id = name_to_id[class_name]
             print(class_id)
+            class_id_image=class_id_images[class_id]
             matches = np.all(label_array == np.array(rgb_values, dtype=np.uint8), axis=-1)
             print(matches)
             class_id_image[matches] = class_id
