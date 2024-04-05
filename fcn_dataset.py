@@ -77,6 +77,7 @@ class CamVidDataset(Dataset):
             class_id = name_to_id[class_name]
             print(class_id)
             matches = np.all(label_array == np.array(rgb_values, dtype=np.uint8), axis=-1)
+            print(matches)
             class_id_image[matches] = class_id
 
         return Image.fromarray(class_id_image, mode='L')
