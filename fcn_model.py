@@ -38,11 +38,12 @@ class FCN8s(nn.Module):
         self.score_pool4 = nn.Conv2d(512, num_classes, kernel_size=1)
         self.score_pool3 = nn.Conv2d(256, num_classes, kernel_size=1)
 
-    def center_crop(layer, target_size):
+    def center_crop(self, layer, target_size):
         _, _, layer_height, layer_width = layer.size()
         diff_y = (layer_height - target_size[0]) // 2
         diff_x = (layer_width - target_size[1]) // 2
         return layer[:, :, diff_y:(diff_y + target_size[0]), diff_x:(diff_x + target_size[1])]
+
 
     def forward(self, x):
         pool1 = self.features_block1(x)
