@@ -55,12 +55,16 @@ class CamVidDataset(Dataset):
         return image, label
 
     def parse_class_dict(self, class_dict_path):
-        class_df = pd.read_csv(class_dict_path)
-        class_to_id = {}
-        for index, row in class_df.iterrows():
-            # Assuming the csv has columns 'name', 'r', 'g', 'b'
-            class_to_id[(row['r'], row['g'], row['b'])] = index
-        return class_to_id
+        class_dict = {}
+        with open(class_dict_path, 'r') as file:
+            reader = csv.reader(file)
+            next(reader)  # Skip the header if there is one
+            for row in reader:
+                class_id = int(row[0])
+                rgb_values = (int(row[1]), int(row[2]), int(row[3]))
+                class_name = row[4]
+                class_dict[class_id] = (rgb_values, class_name)
+        return class_dict
         #raise NotImplementedError("Implement the method")
 
     def rgb_to_class_id(self, label_img):
