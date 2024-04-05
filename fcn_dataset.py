@@ -59,26 +59,25 @@ class CamVidDataset(Dataset):
         class_dict = {}
         with open(class_dict_path, 'r') as file:
             reader = csv.reader(file)
-            next(reader)  # Assuming the first row is a header
+            next(reader)  # Skipping the header if there is one
             for row in reader:
-                try:
-                    class_id = int(row[0])  # Ensure this is a valid integer
-                    rgb_values = (int(row[1]), int(row[2]), int(row[3]))
-                    class_name = row[4]
-                    class_dict[class_id] = (rgb_values, class_name)
-                except ValueError:
-                    # This block will catch non-integer class_id values and continue
-                    print(f"Skipping invalid row: {row}")
-                    continue
+                class_name = row[0]  # Use class name as the key
+                rgb_values = (int(row[1]), int(row[2]), int(row[3]))
+                class_dict[class_name] = rgb_values  # Store RGB values
         return class_dict
         #raise NotImplementedError("Implement the method")
 
     def rgb_to_class_id(self, label_img):
-        class_id_image = np.zeros((label_img.height, label_img.width), dtype=np.int32)
         label_array = np.array(label_img)
-        for class_id, (rgb_values, _) in self.class_dict.items():
+        class_id_image = np.zeros((label_img.height, label_img.width), dtype=np.int32)
+        # Create a mapping of class names to IDs
+        name_to_id = {name: idx for idx, name in enumerate(self.class_dict.keys())}
+
+        for class_name, rgb_values in self.class_dict.items():
+            class_id = name_to_id[class_name]  # Get the ID for the class name
             matches = np.all(label_array == np.array(rgb_values, dtype=np.uint8), axis=-1)
             class_id_image[matches] = class_id
+
         return Image.fromarray(class_id_image, mode='L')
 if __name__ == "__main__":
     images_dir = "train/"
