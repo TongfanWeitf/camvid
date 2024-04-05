@@ -35,14 +35,26 @@ images_dir_test = "test/"
 labels_dir_test = "test_labels/"
 camvid_dataset_test = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_test, labels_dir=labels_dir_test, class_dict_path=class_dict_path, resolution=resolution, crop=False)
 dataloader_test = torch.utils.data.DataLoader(camvid_dataset_test, batch_size=1, shuffle=False, num_workers=4, drop_last=False)
+
+def crop_to_match(output, target):
+    # Calculate the size difference
+    output_height, output_width = output.size(2), output.size(3)
+    target_height, target_width = target.size(1), target.size(2)
+    crop_height = (output_height - target_height) // 2
+    crop_width = (output_width - target_width) // 2
+    
+    # Crop to match the target size
+    cropped_output = output[:, :, crop_height:crop_height + target_height, crop_width:crop_width + target_width]
+    return cropped_output
+    
 criterion = torch.nn.CrossEntropyLoss()
 # Define the loss function and optimizer
 def loss_fn(outputs, labels):
-    outputs_resized = F.interpolate(outputs, size=(labels.size(1), labels.size(2)), mode='bilinear', align_corners=False)
-    loss = criterion(outputs_resized, labels)
+    outputs_cropped = crop_to_match(outputs, labels)
+    # Calculate the loss
+    loss = criterion(outputs_cropped, labels)
     return loss
-    #raise NotImplementedError("Implement the loss function")
-
+    
 def compute_iou(pred, label, num_classes):
     iou_list = []
     #present_classes = torch.unique(label)
