@@ -69,9 +69,9 @@ class CamVidDataset(Dataset):
         class_id_array = np.zeros(label_array.shape[:2], dtype=np.int32)  # Prepare an array for class IDs
         for unique_color in np.unique(label_array.reshape(-1, 3), axis=0):
             color_tuple = tuple(unique_color)
-            if color_tuple not in self.rgb_to_class_id_map:
-                self.rgb_to_class_id_map[color_tuple] = len(self.rgb_to_class_id_map) + 1
-            class_id_array[(label_array == color_tuple).all(axis=2)] = self.rgb_to_class_id_map[color_tuple]
+            if color_tuple not in self.rgb_to_class_id:
+                self.rgb_to_class_id_map[color_tuple] = len(self.rgb_to_class_id) + 1
+            class_id_array[(label_array == color_tuple).all(axis=2)] = self.rgb_to_class_id[color_tuple]
 
         class_id_image = Image.fromarray(class_id_array.astype(np.uint8))
 
