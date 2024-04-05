@@ -78,7 +78,7 @@ class CamVidDataset(Dataset):
             matches = np.all(label_array == np.array(rgb_values, dtype=np.uint8), axis=-1)
             class_id_image[matches] = class_id
             #print(class_id_image)
-        return Image.fromarray(class_id_image, dtype=np.uint8)
+        return Image.fromarray(class_id_image)
 if __name__ == "__main__":
     images_dir = "train/"
     labels_dir = "train_labels/"
