@@ -57,7 +57,7 @@ def compute_iou(pred, label, num_classes):
         else:
             iou = float(intersection) / union
         iou_list.append(iou)
-        print("iou")
+        #print("iou")
     return iou_list
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
