@@ -64,18 +64,18 @@ class CamVidDataset(Dataset):
         #raise NotImplementedError("Implement the method")
 
     def rgb_to_class_id(self, label_img):
-        H, W, _ = label_img.shape
-        class_id_img = np.zeros((H, W), dtype=np.int32)
+        label_array = np.array(label_img)
 
-        for i in range(H):
-            for j in range(W):
-                rgb = tuple(label_img[i, j])
-                if rgb not in self.color_to_class_id:
-                    self.color_to_class_id[rgb] = self.current_class_id
-                    self.current_class_id += 1
-                class_id_img[i, j] = self.color_to_class_id[rgb]
+        class_id_array = np.zeros(label_array.shape[:2], dtype=np.int32)  # Prepare an array for class IDs
+        for unique_color in np.unique(label_array.reshape(-1, 3), axis=0):
+            color_tuple = tuple(unique_color)
+            if color_tuple not in self.rgb_to_class_id_map:
+                self.rgb_to_class_id_map[color_tuple] = len(self.rgb_to_class_id_map) + 1
+            class_id_array[(label_array == color_tuple).all(axis=2)] = self.rgb_to_class_id_map[color_tuple]
 
-        return class_id_img
+        class_id_image = Image.fromarray(class_id_array.astype(np.uint8))
+
+        return class_id_image
 
 if __name__ == "__main__":
     images_dir = "train/"
