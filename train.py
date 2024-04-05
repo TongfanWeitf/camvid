@@ -52,11 +52,12 @@ def compute_iou(pred, label, num_classes):
         intersection = (pred_inds & target_inds).sum().item()
         union = pred_inds.sum().item() + target_inds.sum().item() - intersection
         if union == 0:
-            iou_list.append(float('nan'))  # Avoid division by zero
+            # Skip IoU calculation if there is no union and no intersection
+            iou = float('nan') if intersection == 0 else 1.0
         else:
-            iou_list.append(float(intersection) / max(union, 1))
-    return np.array(iou_list)
-
+            iou = float(intersection) / union
+        iou_list.append(iou)
+    return iou_list
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -89,7 +90,7 @@ def eval_model(model, dataloader, device, save_pred=False):
             iou_list.append(iou)
         pixel_acc = total_correct / total_pixels
         print(np.array(iou_list))
-        mean_iou = np.nanmean(np.array(iou_list), axis=0).mean()
+        mean_iou = np.nanmean([iou for iou in iou_list if not np.isnan(iou)])
         freq_iou = np.nanmean(np.nanmean(np.array(iou_list), axis=1))
         loss = sum(loss_list) / len(loss_list)
         print('Pixel accuracy: {:.4f}, Mean IoU: {:.4f}, Frequency weighted IoU: {:.4f}, Loss: {:.4f}'.format(pixel_acc, mean_iou, freq_iou, loss))
