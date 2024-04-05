@@ -65,17 +65,14 @@ class CamVidDataset(Dataset):
 
     def rgb_to_class_id(self, label_img):
         label_array = np.array(label_img)
+        class_id_image = np.zeros(label_array.shape[:2], dtype=np.int32)
 
-        class_id_array = np.zeros(label_array.shape[:2], dtype=np.int32)  # Prepare an array for class IDs
-        for unique_color in np.unique(label_array.reshape(-1, 3), axis=0):
-            color_tuple = tuple(unique_color)
-            if color_tuple not in self.rgb_to_class_id:
-                self.rgb_to_class_id_map[color_tuple] = len(self.rgb_to_class_id) + 1
-            class_id_array[(label_array == color_tuple).all(axis=2)] = self.rgb_to_class_id[color_tuple]
+        for rgb, (class_id, _) in self.class_dict.items():
+            matches = (label_array == rgb).all(axis=-1)
+            class_id_image[matches] = class_id
 
-        class_id_image = Image.fromarray(class_id_array.astype(np.uint8))
-
-        return class_id_image
+        # Convert the class ID array back to a PIL Image
+        return Image.fromarray(class_id_image.astype(np.uint8))
 
 if __name__ == "__main__":
     images_dir = "train/"
