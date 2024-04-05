@@ -64,20 +64,19 @@ class CamVidDataset(Dataset):
         #raise NotImplementedError("Implement the method")
 
     def rgb_to_class_id(self, label_img):
+        
         label_array = np.array(label_img)
         class_id_image = np.zeros(label_array.shape[:2], dtype=np.int32)
-
-        # Check for dictionary structure correctness
         for rgb, class_data in self.class_dict.items():
+            # Check data integrity in debugging
             if not isinstance(class_data, tuple) or len(class_data) != 2:
-                raise ValueError("Dictionary items must be tuples of the form (class_id, class_name)")
+                raise ValueError(f"Expected tuple of (class_id, class_name), got {class_data}")
 
             class_id, _ = class_data
             matches = (label_array == np.array(rgb, dtype=np.uint8)).all(axis=-1)
             class_id_image[matches] = class_id
 
         return Image.fromarray(class_id_image.astype(np.uint8))
-
 if __name__ == "__main__":
     images_dir = "train/"
     labels_dir = "train_labels/"
