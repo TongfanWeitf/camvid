@@ -102,7 +102,7 @@ def eval_model(model, dataloader, device, save_pred=False):
             iou = compute_iou(predicted.cpu(), labels.cpu(), num_classes)
             iou_list.append(iou)
         pixel_acc = total_correct / total_pixels
-        print(np.array(iou_list))
+        #print(np.array(iou_list))
         valid_iou_scores = [iou for iou in iou_list if not np.isnan(iou).any()]
         mean_iou = np.nanmean(valid_iou_scores, axis=0).mean() if valid_iou_scores else 0
         freq_iou = np.nanmean(np.nanmean(np.array(iou_list), axis=1))
@@ -119,7 +119,9 @@ def visualize_model(model, dataloader, device):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     cls_dict = dataloader.dataset.class_dict.copy()
-    cls_list = [cls_dict[i] for i in range(len(cls_dict))]
+    print(cls_dict)
+    #cls_list = [cls_dict[i] for i in range(len(cls_dict))]
+    cls_list = [cls_dict[key] for key in cls_dict]
     model.eval()
     with torch.no_grad():
         for ind, (images, labels) in enumerate(tqdm(dataloader)):
