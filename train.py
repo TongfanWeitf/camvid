@@ -20,7 +20,7 @@ labels_dir_train = "train_labels/"
 class_dict_path = "class_dict.csv"
 resolution = (384, 512)
 batch_size = 16
-num_epochs = 50
+num_epochs = 10
 
 
 camvid_dataset_train = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_train, labels_dir=labels_dir_train, class_dict_path=class_dict_path, resolution=resolution, crop=True)
@@ -141,9 +141,11 @@ def visualize_model(model, dataloader, device):
             pred_img = np.zeros((label.shape[0], label.shape[1], 3), dtype=np.uint8)
             for j in range(len(cls_list)):
                 mask = label == j
-                label_img[mask] = cls_list[j][0]
+                if np.any(mask):  # Check if there's any mask to avoid dimension mismatch
+                    label_img[mask] = cls_list[j][0]
                 mask = pred == j
-                pred_img[mask] = cls_list[j][0]
+                if np.any(mask):  # Check if there's any mask to avoid dimension mismatch
+                    pred_img[mask] = cls_list[j][0]
             # horizontally concatenate the image, label, and prediction, and save the visualization
             vis_img = np.concatenate([img, label_img, pred_img], axis=1)
             vis_img = Image.fromarray(vis_img)
