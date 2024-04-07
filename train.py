@@ -20,7 +20,7 @@ labels_dir_train = "train_labels/"
 class_dict_path = "class_dict.csv"
 resolution = (384, 512)
 batch_size = 16
-num_epochs = 10
+num_epochs = 50
 
 
 camvid_dataset_train = fcn_dataset.CamVidDataset(root='CamVid/', images_dir=images_dir_train, labels_dir=labels_dir_train, class_dict_path=class_dict_path, resolution=resolution, crop=True)
