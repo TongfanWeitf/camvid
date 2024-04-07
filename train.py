@@ -128,6 +128,8 @@ def visualize_model(model, dataloader, device):
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
+            predicted = F.interpolate(predicted.unsqueeze(1).float(), size=labels.shape[1:], mode='nearest').long().squeeze(1)
+
             
             images_vis = fcn_dataset.rev_normalize(images)
             # Save the images and labels
